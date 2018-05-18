@@ -3,7 +3,6 @@ module Audited
     # Ensure that the model is audited.
     #
     # Options:
-    # * <tt>associated_with</tt> - tests that the audit makes use of the associated_with option
     # * <tt>only</tt> - tests that the audit makes use of the only option *Overrides <tt>except</tt> option*
     # * <tt>except</tt> - tests that the audit makes use of the except option
     # * <tt>requires_comment</tt> - if specified, then the audit must require comments through the <tt>audit_comment</tt> attribute
@@ -11,33 +10,17 @@ module Audited
     #
     # Example:
     #   it { should be_audited }
-    #   it { should be_audited.associated_with(:user) }
     #   it { should be_audited.only(:field_name) }
     #   it { should be_audited.except(:password) }
     #   it { should be_audited.requires_comment }
-    #   it { should be_audited.on(:create).associated_with(:user).except(:password) }
     #
     def be_audited
       AuditMatcher.new
     end
 
-    # Ensure that the model has associated audits
-    #
-    # Example:
-    #   it { should have_associated_audits }
-    #
-    def have_associated_audits
-      AssociatedAuditMatcher.new
-    end
-
     class AuditMatcher # :nodoc:
       def initialize
         @options = {}
-      end
-
-      def associated_with(model)
-        @options[:associated_with] = model
-        self
       end
 
       def only(*fields)
@@ -63,7 +46,6 @@ module Audited
       def matches?(subject)
         @subject = subject
         auditing_enabled? &&
-          associated_with_model? &&
           records_changes_to_specified_fields? &&
           comment_required_valid?
       end
@@ -78,7 +60,6 @@ module Audited
 
       def description
         description = "audited"
-        description += " associated with #{@options[:associated_with]}" if @options.key?(:associated_with)
         description += " only => #{@options[:only].join ', '}"          if @options.key?(:only)
         description += " except => #{@options[:except].join(', ')}"     if @options.key?(:except)
         description += " requires audit_comment"                        if @options.key?(:comment_required)
@@ -99,11 +80,6 @@ module Audited
 
       def model_class
         @subject.class
-      end
-
-      def associated_with_model?
-        expects "#{model_class} to record audits to associated model #{@options[:associated_with]}"
-        model_class.audit_associated_with == @options[:associated_with]
       end
 
       def records_changes_to_specified_fields?
@@ -131,42 +107,6 @@ module Audited
         else
           true
         end
-      end
-    end
-
-    class AssociatedAuditMatcher # :nodoc:
-      def matches?(subject)
-        @subject = subject
-
-        association_exists?
-      end
-
-      def failure_message
-        "Expected #{model_class} to have associated audits"
-      end
-
-      def negative_failure_message
-        "Expected #{model_class} to not have associated audits"
-      end
-
-      def description
-        "has associated audits"
-      end
-
-      protected
-
-      def model_class
-        @subject.class
-      end
-
-      def reflection
-        model_class.reflect_on_association(:associated_audits)
-      end
-
-      def association_exists?
-        (!reflection.nil?) &&
-          reflection.macro == :has_many &&
-          reflection.options[:class_name] == Audited.audit_class.name
       end
     end
   end

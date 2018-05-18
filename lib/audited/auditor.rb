@@ -39,7 +39,6 @@ module Audited
         return if self.included_modules.include?(Audited::Auditor::AuditedInstanceMethods)
 
         class_attribute :non_audited_columns,   :instance_writer => false
-        class_attribute :audit_associated_with, :instance_writer => false
 
         if options[:only]
           except = self.column_names - Array(options[:only]).flatten.map(&:to_s)
@@ -48,7 +47,6 @@ module Audited
           except |= Array(options[:except]).collect(&:to_s) if options[:except]
         end
         self.non_audited_columns = except
-        self.audit_associated_with = options[:associated_with]
 
         if options[:comment_required]
           validates_presence_of :audit_comment, :if => :auditing_enabled
@@ -77,10 +75,6 @@ module Audited
         include Audited::Auditor::AuditedInstanceMethods
 
         self.auditing_enabled = true
-      end
-
-      def has_associated_audits
-        has_many :associated_audits, :as => :associated, :class_name => Audited.audit_class.name
       end
     end
 
@@ -204,7 +198,6 @@ module Audited
       end
 
       def write_audit(attrs)
-        attrs[:associated] = self.send(audit_associated_with) unless audit_associated_with.nil?
         self.audit_comment = nil
         run_callbacks(:audit)  { self.audits.create(attrs) } if auditing_enabled
       end

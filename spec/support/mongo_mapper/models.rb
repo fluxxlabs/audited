@@ -124,8 +124,6 @@ module Models
       key :suspended_at, Time
       key :logins, Integer, :default => 0
       timestamps!
-
-      has_associated_audits
     end
 
     class OwnedCompany
@@ -136,7 +134,6 @@ module Models
 
       belongs_to :owner, :class_name => "Owner"
       attr_accessible :name, :owner # declare attr_accessible before calling aaa
-      audited :associated_with => :owner
     end
 
     class OnUpdateDestroy

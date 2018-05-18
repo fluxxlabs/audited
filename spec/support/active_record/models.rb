@@ -58,7 +58,6 @@ module Models
 
     class Owner < ::ActiveRecord::Base
       self.table_name = 'users'
-      has_associated_audits
       has_many :companies, class_name: "OwnedCompany", dependent: :destroy
     end
 
@@ -66,7 +65,6 @@ module Models
       self.table_name = 'companies'
       belongs_to :owner, :class_name => "Owner"
       attr_accessible :name, :owner # declare attr_accessible before calling aaa
-      audited :associated_with => :owner
     end
 
     class OnUpdateDestroy < ::ActiveRecord::Base
