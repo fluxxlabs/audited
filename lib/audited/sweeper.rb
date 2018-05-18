@@ -18,15 +18,11 @@ module Audited
     def before_create(audit)
       audit.user ||= current_user
       audit.remote_address = controller.try(:request).try(:remote_ip)
-      audit.request_uuid = request_uuid if request_uuid
+      audit.impersonator_user_id = session_impersonator_user_id
     end
 
     def current_user
       controller.send(Audited.current_user_method) if controller.respond_to?(Audited.current_user_method, true)
-    end
-
-    def request_uuid
-      controller.try(:request).try(:uuid)
     end
 
     def add_observer!(klass)
@@ -51,6 +47,12 @@ module Audited
 
     def controller=(value)
       ::Audited.store[:current_controller] = value
+    end
+
+    private
+
+    def session_impersonator_user_id
+      controller.try(:session).try(:send, :[], :impersonator_user_id).try(:presence)
     end
   end
 end

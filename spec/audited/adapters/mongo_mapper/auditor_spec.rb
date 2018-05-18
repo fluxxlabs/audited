@@ -61,10 +61,6 @@ describe Audited::Auditor, :adapter => :mongo_mapper do
       }.to change( Audited.audit_class, :count ).by(1)
     end
 
-    it "should create associated audit" do
-      expect(user.audits.count).to eq(1)
-    end
-
     it "should set the action to create" do
       expect(user.audits.first.action).to eq('create')
       expect(Audited.audit_class.creates.sort(:id.asc).last).to eq(user.audits.first)
@@ -220,35 +216,6 @@ describe Audited::Auditor, :adapter => :mongo_mapper do
       }.to_not raise_error
 
       expect( user.audits ).to be_empty
-    end
-  end
-
-  describe "associated with" do
-    let(:owner) { Models::MongoMapper::Owner.create(:name => 'Models::MongoMapper::Owner') }
-    let(:owned_company) { Models::MongoMapper::OwnedCompany.create!(:name => 'The auditors', :owner => owner) }
-
-    it "should record the associated object on create" do
-      expect(owned_company.audits.first.associated).to eq(owner)
-    end
-
-    it "should store the associated object on update" do
-      owned_company.update_attribute(:name, 'The Auditors')
-      expect(owned_company.audits.all.last.associated).to eq(owner)
-    end
-
-    it "should store the associated object on destroy" do
-      owned_company.destroy
-      expect(owned_company.audits.all.last.associated).to eq(owner)
-    end
-  end
-
-  describe "has associated audits" do
-    let!(:owner) { Models::MongoMapper::Owner.create!(:name => 'Models::MongoMapper::Owner') }
-    let!(:owned_company) { Models::MongoMapper::OwnedCompany.create!(:name => 'The auditors', :owner => owner) }
-
-    it "should list the associated audits" do
-      expect(owner.associated_audits.length).to eq(1)
-      expect(owner.associated_audits.first.auditable).to eq(owned_company)
     end
   end
 

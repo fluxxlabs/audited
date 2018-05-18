@@ -9,9 +9,8 @@ module Audited
       def setup_audit
         belongs_to :auditable,  :polymorphic => true
         belongs_to :user,       :polymorphic => true
-        belongs_to :associated, :polymorphic => true
 
-        before_create :set_version_number, :set_audit_user, :set_request_uuid
+        before_create :set_version_number, :set_audit_user
 
         cattr_accessor :audited_class_names
         self.audited_class_names = Set.new
@@ -95,10 +94,6 @@ module Audited
     def set_audit_user
       self.user = Thread.current[:audited_user] if Thread.current[:audited_user]
       nil # prevent stopping callback chains
-    end
-
-    def set_request_uuid
-      self.request_uuid ||= SecureRandom.uuid
     end
   end
 end

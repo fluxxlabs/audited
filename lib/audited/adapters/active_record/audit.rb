@@ -12,7 +12,6 @@ module Audited
       # * <tt>audited_changes</tt>: a serialized hash of all the changes
       # * <tt>comment</tt>: a comment set with the audit
       # * <tt>version</tt>: the version of the model
-      # * <tt>request_uuid</tt>: a uuid based that allows audits from the same controller request
       # * <tt>created_at</tt>: Time that the change was performed
       #
       class Audit < ::ActiveRecord::Base

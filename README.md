@@ -168,45 +168,6 @@ end
 post.audits.last.user # => #<User id: 1>
 ```
 
-### Associated Audits
-
-Sometimes it's useful to associate an audit with a model other than the one being changed. For instance, given the following models:
-
-```ruby
-class User < ActiveRecord::Base
-  belongs_to :company
-  audited
-end
-
-class Company < ActiveRecord::Base
-  has_many :users
-end
-```
-
-Every change to a user is audited, but what if you want to grab all of the audits of users belonging to a particular company? You can add the `:associated_with` option to your `audited` call:
-
-```ruby
-class User < ActiveRecord::Base
-  belongs_to :company
-  audited associated_with: :company
-end
-
-class Company < ActiveRecord::Base
-  has_many :users
-  has_associated_audits
-end
-```
-
-Now, when a audit is created for a user, that user's company is also saved alongside the audit. This makes it much easier (and faster) to access audits indirectly related to a company.
-
-```ruby
-company = Company.create!(name: "Collective Idea")
-user = company.users.create!(name: "Steve")
-user.update_attribute!(name: "Steve Richert")
-user.audits.last.associated # => #<Company name: "Collective Idea">
-company.associated_audits.last.auditable # => #<User name: "Steve Richert">
-```
-
 ### Disabling auditing
 
 If you want to disable auditing temporarily doing certain tasks, there are a few

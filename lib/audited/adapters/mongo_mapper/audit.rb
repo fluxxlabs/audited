@@ -19,8 +19,6 @@ module Audited
 
         key :auditable_id, ObjectId
         key :auditable_type, String
-        key :associated_id, ObjectId
-        key :associated_type, String
         key :user_id, ObjectId
         key :user_type, String
         key :username, String
@@ -29,7 +27,6 @@ module Audited
         key :version, Integer, :default => 0
         key :comment, String
         key :remote_address, String
-        key :request_uuid, String
         key :created_at, Time
 
         include Audited::Audit

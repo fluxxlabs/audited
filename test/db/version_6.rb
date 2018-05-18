@@ -11,7 +11,5 @@ ActiveRecord::Schema.define do
     t.column :comment, :string
     t.column :created_at, :datetime
     t.column :remote_address, :string
-    t.column :associated_id, :integer
-    t.column :associated_type, :string
   end
 end
