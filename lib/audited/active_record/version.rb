@@ -1,5 +1,5 @@
 module Audited
   module ActiveRecord
-    VERSION = "4.2.2-fluxx"
+    VERSION = "4.2.2"
   end
 end
